@@ -1,0 +1,214 @@
+/** @format */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+/* Ensure drawer works properly */
+.drawer-toggle {
+  @apply hidden;
+}
+
+.drawer-toggle:checked ~ .drawer-content .drawer-side {
+  @apply translate-x-0;
+}
+
+.drawer-side {
+  @apply fixed inset-y-0 left-0 z-40 transform -translate-x-full transition-transform duration-300 ease-in-out;
+  @apply lg:translate-x-0 lg:static lg:inset-0;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  height: 100%;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Loading animation for better UX */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Smooth transitions for theme switching */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Fix for react-select in modal */
+.modal .react-select__menu {
+  z-index: 1000;
+}
+
+/* Custom styles for better mobile experience */
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.875rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+/* Animation for sidebar */
+.drawer-side {
+  transition: transform 0.3s ease-in-out;
+}
+
+/* Better focus states */
+.btn:focus,
+.input:focus,
+.textarea:focus,
+.select:focus {
+  outline: 2px solid hsl(var(--p));
+  outline-offset: 2px;
+}
+
+/* Loading states */
+.btn.loading {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Toast customizations */
+.toast {
+  font-family: inherit;
+}
+
+/* Table responsive improvements */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table td,
+.table th {
+  white-space: nowrap;
+  padding: 0.75rem 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .table td,
+  .table th {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Modal improvements */
+.modal-box {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Form improvements */
+.form-control {
+  margin-bottom: 1rem;
+}
+
+.form-control:last-child {
+  margin-bottom: 0;
+}
+
+/* Badge improvements */
+.badge {
+  font-weight: 500;
+}
+
+/* Card improvements */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Button improvements */
+.btn {
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Sidebar improvements */
+.drawer-side .menu li a {
+  transition: all 0.2s ease;
+}
+
+.drawer-side .menu li a:hover {
+  transform: translateX(4px);
+}
