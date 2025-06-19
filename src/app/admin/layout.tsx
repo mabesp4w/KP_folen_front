@@ -1,37 +1,19 @@
 /** @format */
 
-// src/app/(dashboard)/layout.tsx
-"use client";
-
-import React from "react";
+import AuthGuard from "@/components/auth/AuthGuard";
 import MainLayout from "@/components/layouts/MainLayout";
-import useAuth from "@/stores/useAuth";
+import React from "react";
 
-export default function DashboardLayout({
-  children,
-}: {
+type Props = {
   children: React.ReactNode;
-}) {
-  const { isAuthenticated, user } = useAuth();
+};
 
-  React.useEffect(() => {
-    // Simulate auth check - in real app you'd check token validity
-    if (!isAuthenticated && !user) {
-      // For demo purposes, let's set a default user
-      const demoUser = {
-        id: "1",
-        name: "Admin",
-        email: "admin@rumfararur.com",
-        role: "admin",
-      };
-      // You can remove this and implement real auth
-      useAuth.getState().login(demoUser);
-    }
-  }, [isAuthenticated, user]);
+const layout = ({ children }: Props) => {
+  return (
+    <AuthGuard requiredRole="admin">
+      <MainLayout>{children}</MainLayout>
+    </AuthGuard>
+  );
+};
 
-  // if (!isAuthenticated) {
-  //   redirect("/login");
-  // }
-
-  return <MainLayout>{children}</MainLayout>;
-}
+export default layout;

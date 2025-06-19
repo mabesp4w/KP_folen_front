@@ -21,7 +21,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const isAdmin = user?.role === "admin";
-  console.log({ user });
 
   const handleMenuToggle = () => {
     if (isAdmin) {

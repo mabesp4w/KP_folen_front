@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import useTheme from "@/stores/useTheme";
 import useAuth from "@/stores/useAuth";
 import UserNavigation from "./UserNavigation";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   onMenuToggle?: () => void;
@@ -21,10 +22,11 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
   const { theme, toggleTheme } = useTheme();
   const { logout, user } = useAuth();
+  const router = useRouter();
 
   const handleLogout = () => {
     logout();
-    window.location.href = "/login";
+    router.push("/login");
   };
 
   return (

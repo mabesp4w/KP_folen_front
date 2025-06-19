@@ -7,11 +7,10 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { Music } from "lucide-react";
 import useAuth from "@/stores/useAuth";
 import useTheme from "@/stores/useTheme";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import Image from "next/image";
 
 interface LoginForm {
   email: string;
@@ -33,23 +32,18 @@ const LoginPage: React.FC = () => {
   const onSubmit = async (data: LoginForm) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await login(data);
 
-      // For demo purposes, accept any credentials
-      const user = {
-        id: "1",
-        name: "Admin Rum Fararur",
-        email: data.email,
-        role: "admin",
-      };
-
-      login(user);
-      toast.success("Login berhasil!");
-      router.push("/admin");
+      // Redirect berdasarkan role atau ke dashboard
+      const user = useAuth.getState().user;
+      if (user?.role === "admin") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard");
+      }
     } catch (error) {
+      // Error handling sudah ditangani di store
       console.error("Login failed:", error);
-      toast.error("Login gagal!");
     } finally {
       setLoading(false);
     }
@@ -64,11 +58,13 @@ const LoginPage: React.FC = () => {
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
             <div className="flex justify-center">
-              <Music size={64} className="text-primary" />
+              <Image
+                src="/images/logo.jpeg"
+                alt="Logo"
+                width={200}
+                height={200}
+              />
             </div>
-            <h2 className="mt-6 text-3xl font-extrabold">
-              Rum Fararur Production
-            </h2>
             <p className="mt-2 text-sm text-gray-600">
               Silakan login untuk melanjutkan
             </p>
@@ -95,6 +91,7 @@ const LoginPage: React.FC = () => {
                   label="Password"
                   type="password"
                   autoComplete="current-password"
+                  showPasswordToggle={true}
                   {...register("password", {
                     required: "Password harus diisi",
                     minLength: {
@@ -114,12 +111,6 @@ const LoginPage: React.FC = () => {
                   Masuk
                 </Button>
               </form>
-
-              <div className="mt-4 text-center text-sm text-gray-500">
-                <p>Demo Credentials:</p>
-                <p>Email: admin@rumfararur.com</p>
-                <p>Password: password</p>
-              </div>
             </div>
           </div>
         </div>
