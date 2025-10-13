@@ -11,12 +11,16 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Pagination } from "@/components/ui/Pagination";
 import { SearchBox } from "@/components/ui/SearchBox";
 import { EmptyState } from "@/components/ui/EmptyState";
+import VideoPlayerModal from "@/components/ui/VideoPlayerModal";
+import { Dokumentasi } from "@/types";
 
 const GaleriPage: React.FC = () => {
     const { dtDokumentasi, setDokumentasi, loading } = useDokumentasi();
     const [search, setSearch] = React.useState("");
     const [selectedJenis, setSelectedJenis] = React.useState("");
     const [currentPage, setCurrentPage] = React.useState(1);
+    const [selectedItem, setSelectedItem] = React.useState<Dokumentasi | null>(null);
+    const [showModal, setShowModal] = React.useState(false);
 
     const jenisOptions = [
         { value: "foto", label: "Foto", icon: ImageIcon },
@@ -53,8 +57,14 @@ const GaleriPage: React.FC = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    const handleItemClick = () => {
-        // Placeholder for future modal functionality
+    const handleItemClick = (item: Dokumentasi) => {
+        setSelectedItem(item);
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setTimeout(() => setSelectedItem(null), 300);
     };
 
     return (
@@ -182,6 +192,13 @@ const GaleriPage: React.FC = () => {
                     />
                 )}
             </div>
+
+            {/* Video/Image Player Modal */}
+            <VideoPlayerModal
+                isOpen={showModal}
+                onClose={handleCloseModal}
+                item={selectedItem}
+            />
         </div>
     );
 };

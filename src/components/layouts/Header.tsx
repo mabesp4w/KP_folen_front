@@ -33,13 +33,15 @@ const Header: React.FC<HeaderProps> = ({
     router.push("/login");
   };
 
+  const isAdmin = user?.role === "admin";
+
   return (
     <div className="navbar bg-primary text-primary-content sticky top-0 z-40 shadow-lg">
       <div className="navbar-start">
-        {showMenuButton && user && (
+        {showMenuButton && (
           <button
             onClick={onMenuToggle}
-            className="btn btn-square btn-ghost lg:hidden text-white"
+            className={`btn btn-square btn-ghost text-white ${isAdmin ? '' : 'lg:hidden'}`}
           >
             <Menu size={20} />
           </button>

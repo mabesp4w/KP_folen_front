@@ -11,6 +11,8 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Pagination } from "@/components/ui/Pagination";
 import { SearchBox } from "@/components/ui/SearchBox";
 import { EmptyState } from "@/components/ui/EmptyState";
+import MusicPlayerModal from "@/components/ui/MusicPlayerModal";
+import { KaryaMusik } from "@/types";
 
 const MusikPage: React.FC = () => {
     const { dtKaryaMusik, setKaryaMusik, loading } = useKaryaMusik();
@@ -18,6 +20,9 @@ const MusikPage: React.FC = () => {
     const [selectedGenre, setSelectedGenre] = React.useState("");
     const [genres, setGenres] = React.useState<string[]>([]);
     const [currentPage, setCurrentPage] = React.useState(1);
+    const [selectedMusic, setSelectedMusic] = React.useState<KaryaMusik | null>(null);
+    const [showModal, setShowModal] = React.useState(false);
+    const [playerType, setPlayerType] = React.useState<'audio' | 'video'>('audio');
 
     React.useEffect(() => {
         loadGenres();
@@ -65,6 +70,18 @@ const MusikPage: React.FC = () => {
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    const handlePlayMusic = (music: KaryaMusik) => {
+        setSelectedMusic(music);
+        // Prioritize video if available, otherwise audio
+        setPlayerType(music.url_video ? 'video' : 'audio');
+        setShowModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setTimeout(() => setSelectedMusic(null), 300);
     };
 
     return (
@@ -178,7 +195,7 @@ const MusikPage: React.FC = () => {
                     <>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                             {dtKaryaMusik.data.map((music) => (
-                                <MusicCard key={music.id} music={music} />
+                                <MusicCard key={music.id} music={music} onPlay={handlePlayMusic} />
                             ))}
                         </div>
 
@@ -205,6 +222,14 @@ const MusikPage: React.FC = () => {
                     />
                 )}
             </div>
+
+            {/* Music Player Modal */}
+            <MusicPlayerModal
+                isOpen={showModal}
+                onClose={handleCloseModal}
+                music={selectedMusic}
+                type={playerType}
+            />
         </div>
     );
 };

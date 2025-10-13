@@ -4,12 +4,13 @@
 "use client";
 
 import React from "react";
-import { Plus, Edit, Trash2, ExternalLink, Music } from "lucide-react";
+import { Plus, Edit, Trash2, ExternalLink, Music, Play } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { SearchBox } from "@/components/ui/SearchBox";
 import { Table } from "@/components/ui/Table";
 import { Pagination } from "@/components/ui/Pagination";
 import KaryaMusikForm from "@/components/forms/KaryaMusikForm";
+import MusicPlayerModal from "@/components/ui/MusicPlayerModal";
 import useKaryaMusik from "@/stores/crud/useKaryaMusik";
 import { KaryaMusik } from "@/types";
 import toast from "react-hot-toast";
@@ -27,6 +28,9 @@ const KaryaMusikPage: React.FC = () => {
     order: "desc",
     genre: "",
   });
+  const [selectedMusic, setSelectedMusic] = React.useState<KaryaMusik | null>(null);
+  const [showModal, setShowModal] = React.useState(false);
+  const [playerType, setPlayerType] = React.useState<'audio' | 'video'>('audio');
 
   // Load data
   React.useEffect(() => {
@@ -149,28 +153,53 @@ const KaryaMusikPage: React.FC = () => {
       key: "url_video" as keyof KaryaMusik,
       title: "Media",
       render: (value: string, record: KaryaMusik) => (
-        <div className="flex gap-1">
+        <div className="flex flex-wrap gap-1">
           {record.url_video && (
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={ExternalLink}
-              onClick={() => handleViewFile(record.url_video || "")}
-              className="btn-xs"
-            >
-              Video
-            </Button>
+            <>
+              <Button
+                variant="primary"
+                size="sm"
+                icon={Play}
+                onClick={() => handlePlayMusic(record, 'video')}
+                className="btn-xs"
+                title="Play Video"
+              >
+                Video
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={ExternalLink}
+                onClick={() => handleViewFile(record.url_video || "")}
+                className="btn-xs"
+                title="Open in new tab"
+              />
+            </>
           )}
           {record.url_audio && (
-            <Button
-              variant="ghost"
-              size="sm"
-              icon={Music}
-              onClick={() => handleViewFile(record.url_audio || "")}
-              className="btn-xs"
-            >
-              Audio
-            </Button>
+            <>
+              <Button
+                variant="primary"
+                size="sm"
+                icon={Play}
+                onClick={() => handlePlayMusic(record, 'audio')}
+                className="btn-xs"
+                title="Play Audio"
+              >
+                Audio
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                icon={ExternalLink}
+                onClick={() => handleViewFile(record.url_audio || "")}
+                className="btn-xs"
+                title="Open in new tab"
+              />
+            </>
+          )}
+          {!record.url_video && !record.url_audio && (
+            <span className="text-gray-400 text-xs">No media</span>
           )}
         </div>
       ),
@@ -204,6 +233,17 @@ const KaryaMusikPage: React.FC = () => {
     window.open(fileUrl, "_blank");
   };
 
+  const handlePlayMusic = (music: KaryaMusik, type: 'audio' | 'video') => {
+    setSelectedMusic(music);
+    setPlayerType(type);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setTimeout(() => setSelectedMusic(null), 300);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -216,7 +256,7 @@ const KaryaMusikPage: React.FC = () => {
       {/* Filters */}
       <div className="card bg-base-100 shadow-md">
         <div className="card-body">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
             <SearchBox
               placeholder="Cari judul, artis, atau genre..."
               onSearch={(value) => setFilters({ ...filters, search: value })}
@@ -259,6 +299,14 @@ const KaryaMusikPage: React.FC = () => {
         isOpen={showForm}
         onClose={handleCloseForm}
         editData={editData}
+      />
+
+      {/* Music Player Modal */}
+      <MusicPlayerModal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        music={selectedMusic}
+        type={playerType}
       />
     </div>
   );

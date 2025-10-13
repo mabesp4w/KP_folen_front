@@ -5,13 +5,14 @@
 
 import React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Music, Calendar, ArrowLeft, Play, ExternalLink, Tag } from "lucide-react";
+import { Music, Calendar, ArrowLeft, Play, Tag } from "lucide-react";
 import useKaryaMusik from "@/stores/crud/useKaryaMusik";
 import ScrollRevealComponent from "@/components/ui/ScrollRevealComponent";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { url_storage } from "@/services/baseURL";
 import moment from "moment";
 import { KaryaMusik } from "@/types";
+import MusicPlayerModal from "@/components/ui/MusicPlayerModal";
 
 const MusicDetailPage: React.FC = () => {
     const params = useParams();
@@ -19,6 +20,8 @@ const MusicDetailPage: React.FC = () => {
     const { setShowKaryaMusik } = useKaryaMusik();
     const [music, setMusic] = React.useState<KaryaMusik | null>(null);
     const [loading, setLoading] = React.useState(true);
+    const [showModal, setShowModal] = React.useState(false);
+    const [playerType, setPlayerType] = React.useState<'audio' | 'video'>('audio');
 
     React.useEffect(() => {
         loadData();
@@ -31,6 +34,24 @@ const MusicDetailPage: React.FC = () => {
             setMusic(result.data);
         }
         setLoading(false);
+    };
+
+    const handlePlayAudio = () => {
+        if (music) {
+            setPlayerType('audio');
+            setShowModal(true);
+        }
+    };
+
+    const handlePlayVideo = () => {
+        if (music) {
+            setPlayerType('video');
+            setShowModal(true);
+        }
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false);
     };
 
     if (loading) {
@@ -176,27 +197,23 @@ const MusicDetailPage: React.FC = () => {
 
                                     <div className="space-y-2">
                                         {music.url_audio && (
-                                            <a
-                                                href={music.url_audio}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <button
+                                                onClick={handlePlayAudio}
                                                 className="btn btn-primary w-full gap-2"
                                             >
                                                 <Play size={20} />
                                                 Putar Audio
-                                            </a>
+                                            </button>
                                         )}
 
                                         {music.url_video && (
-                                            <a
-                                                href={music.url_video}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
+                                            <button
+                                                onClick={handlePlayVideo}
                                                 className="btn btn-secondary w-full gap-2"
                                             >
-                                                <ExternalLink size={20} />
+                                                <Play size={20} />
                                                 Tonton Video
-                                            </a>
+                                            </button>
                                         )}
 
                                         {!music.url_audio && !music.url_video && (
@@ -211,6 +228,14 @@ const MusicDetailPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Music Player Modal */}
+            <MusicPlayerModal
+                isOpen={showModal}
+                onClose={handleCloseModal}
+                music={music}
+                type={playerType}
+            />
         </div>
     );
 };

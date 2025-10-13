@@ -35,7 +35,7 @@ const PublicNavbar: React.FC = () => {
     ];
 
     return (
-        <div className="bg-base-100 border-b border-base-300 sticky top-16 z-30 shadow-sm">
+        <div className="hidden lg:block bg-base-100 border-b border-base-300 sticky top-16 z-30 shadow-sm">
             <div className="container mx-auto px-6">
                 <nav className="flex items-center justify-center">
                     <ul className="menu menu-horizontal gap-1">

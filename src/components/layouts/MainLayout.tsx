@@ -8,10 +8,9 @@ import useTheme from "@/stores/useTheme";
 import useAuth from "@/stores/useAuth";
 import Header from "./Header";
 import AdminSidebar from "./AdminSidebar";
-import MobileUserMenu from "./MobileUserMenu";
 import UserNavbar from "./UserNavbar";
 import PublicNavbar from "./PublicNavbar";
-import PublicMobileMenu from "./PublicMobileMenu";
+import BottomNavigation from "./BottomNavigation";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -79,14 +78,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       {/* Navigation - tampilkan UserNavbar jika login, PublicNavbar jika belum login */}
       {user ? <UserNavbar /> : <PublicNavbar />}
 
-      {/* Mobile Menu - tampilkan berdasarkan status login */}
-      {user ? (
-        <MobileUserMenu isOpen={mobileMenuOpen} onClose={handleCloseMobileMenu} />
-      ) : (
-        <PublicMobileMenu isOpen={mobileMenuOpen} onClose={handleCloseMobileMenu} />
-      )}
-
+      {/* Main Content */}
       <main className="flex-1">{children}</main>
+
+      {/* Bottom Navigation for Mobile - tampilkan seperti bottom sheet */}
+      <BottomNavigation
+        isOpen={mobileMenuOpen}
+        onClose={handleCloseMobileMenu}
+      />
     </div>
   );
 };
