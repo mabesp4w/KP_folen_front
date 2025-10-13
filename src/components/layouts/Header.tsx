@@ -4,7 +4,7 @@
 "use client";
 
 import React from "react";
-import { Menu, Sun, Moon, LogOut } from "lucide-react";
+import { Menu, Sun, Moon, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import useTheme from "@/stores/useTheme";
 import useAuth from "@/stores/useAuth";
@@ -29,10 +29,14 @@ const Header: React.FC<HeaderProps> = ({
     router.push("/login");
   };
 
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
   return (
     <div className="navbar bg-primary text-primary-content sticky top-0 z-40 shadow-lg">
       <div className="navbar-start">
-        {showMenuButton && (
+        {showMenuButton && user && (
           <button
             onClick={onMenuToggle}
             className="btn btn-square btn-ghost lg:hidden text-white"
@@ -46,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({
       </div>
 
       <div className="navbar-center">
-        {/* User Navigation - tampil hanya untuk user biasa */}
+        {/* User Navigation - tampil hanya untuk user biasa yang sudah login */}
         {user?.role === "user" && <UserNavigation />}
       </div>
 
@@ -58,29 +62,44 @@ const Header: React.FC<HeaderProps> = ({
           onClick={toggleTheme}
           className="text-white hover:bg-primary-focus border-none"
         />
-        <div className="dropdown dropdown-end">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-ghost btn-sm text-white hover:bg-primary-focus"
+
+        {/* Tampilkan tombol Login jika belum login */}
+        {!user ? (
+          <Button
+            variant="ghost"
+            size="sm"
+            icon={LogIn}
+            onClick={handleLogin}
+            className="text-white hover:bg-primary-focus border-none"
           >
-            {user?.name || "User"}
+            Login
+          </Button>
+        ) : (
+          /* Tampilkan dropdown user jika sudah login */
+          <div className="dropdown dropdown-end">
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-ghost btn-sm text-white hover:bg-primary-focus"
+            >
+              {user?.name || "User"}
+            </div>
+            <ul
+              tabIndex={0}
+              className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-error hover:bg-error hover:text-white"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              </li>
+            </ul>
           </div>
-          <ul
-            tabIndex={0}
-            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
-          >
-            <li>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-error hover:bg-error hover:text-white"
-              >
-                <LogOut size={16} />
-                Logout
-              </button>
-            </li>
-          </ul>
-        </div>
+        )}
       </div>
     </div>
   );

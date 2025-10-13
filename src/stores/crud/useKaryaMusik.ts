@@ -4,7 +4,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import { crud } from "@/services/baseURL";
-import { KaryaMusik, PaginatedData, StoreParams } from "@/types";
+import { KaryaMusik, PaginatedData, StoreParams, UploadResponse } from "@/types";
 
 type Store = {
   dtKaryaMusik: PaginatedData<KaryaMusik>;
@@ -46,6 +46,15 @@ type Store = {
   getGenres: () => Promise<{
     status: string;
     data?: string[];
+    error?: any;
+  }>;
+
+  uploadFile: (
+    file: File,
+    jenis: string
+  ) => Promise<{
+    status: string;
+    data?: UploadResponse;
     error?: any;
   }>;
 };
@@ -210,6 +219,33 @@ const useKaryaMusik = create<Store>()(
         const response = await crud({
           method: "get",
           url: "/karya-musik/data/genres",
+        });
+
+        return {
+          status: "berhasil",
+          data: response.data.data,
+        };
+      } catch (error: any) {
+        return {
+          status: "error",
+          error: error.response?.data,
+        };
+      }
+    },
+
+    uploadFile: async (file, jenis) => {
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("jenis", jenis);
+
+        const response = await crud({
+          method: "post",
+          url: "/karya-musik/upload",
+          data: formData,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         });
 
         return {

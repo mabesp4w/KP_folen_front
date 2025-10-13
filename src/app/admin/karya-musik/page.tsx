@@ -17,19 +17,29 @@ import moment from "moment";
 import { url_storage } from "@/services/baseURL";
 
 const KaryaMusikPage: React.FC = () => {
-  const { dtKaryaMusik, loading, setKaryaMusik, removeData } = useKaryaMusik();
+  const { dtKaryaMusik, loading, setKaryaMusik, removeData, getGenres } = useKaryaMusik();
   const [showForm, setShowForm] = React.useState(false);
   const [editData, setEditData] = React.useState<KaryaMusik | null>(null);
+  const [genres, setGenres] = React.useState<string[]>([]);
   const [filters, setFilters] = React.useState({
     search: "",
     sortby: "",
     order: "desc",
+    genre: "",
   });
 
   // Load data
   React.useEffect(() => {
     loadData();
+    loadGenres();
   }, []);
+
+  const loadGenres = async () => {
+    const result = await getGenres();
+    if (result.status === "berhasil" && result.data) {
+      setGenres(result.data);
+    }
+  };
 
   React.useEffect(() => {
     const debounce = setTimeout(() => {
@@ -76,6 +86,27 @@ const KaryaMusikPage: React.FC = () => {
   };
 
   const columns = [
+    {
+      key: "thumbnail" as keyof KaryaMusik,
+      title: "Thumbnail",
+      render: (value: string) => (
+        <div className="avatar">
+          <div className="w-16 h-16 rounded">
+            {value ? (
+              <img
+                src={`${url_storage}/${value}`}
+                alt="Thumbnail"
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <div className="bg-gray-200 flex items-center justify-center w-full h-full">
+                <Music className="text-gray-400" size={24} />
+              </div>
+            )}
+          </div>
+        </div>
+      ),
+    },
     {
       key: "judul" as keyof KaryaMusik,
       title: "Judul",
@@ -190,6 +221,23 @@ const KaryaMusikPage: React.FC = () => {
               placeholder="Cari judul, artis, atau genre..."
               onSearch={(value) => setFilters({ ...filters, search: value })}
             />
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text">Filter Genre</span>
+              </label>
+              <select
+                className="select select-bordered w-full"
+                value={filters.genre}
+                onChange={(e) => setFilters({ ...filters, genre: e.target.value })}
+              >
+                <option value="">Semua Genre</option>
+                {genres.map((genre) => (
+                  <option key={genre} value={genre}>
+                    {genre}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>

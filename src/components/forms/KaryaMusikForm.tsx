@@ -13,6 +13,7 @@ import { KaryaMusik, Kategori } from "@/types";
 import useKaryaMusik from "@/stores/crud/useKaryaMusik";
 import useKategori from "@/stores/crud/useKategori";
 import toast from "react-hot-toast";
+import { Image } from "lucide-react";
 
 interface KaryaMusikFormProps {
   isOpen: boolean;
@@ -25,21 +26,32 @@ const KaryaMusikForm: React.FC<KaryaMusikFormProps> = ({
   onClose,
   editData,
 }) => {
-  const { addData, updateData } = useKaryaMusik();
+  const { addData, updateData, uploadFile, getGenres } = useKaryaMusik();
   const { getByJenis } = useKategori();
   const [loading, setLoading] = React.useState(false);
+  const [uploadingThumbnail, setUploadingThumbnail] = React.useState(false);
+  const [uploadedThumbnail, setUploadedThumbnail] = React.useState<string>("");
   const [kategoriOptions, setKategoriOptions] = React.useState<Kategori[]>([]);
+  const [genreOptions, setGenreOptions] = React.useState<string[]>([]);
+
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<KaryaMusik>({
-    defaultValues: editData || {},
+    defaultValues: {
+      ...editData,
+      kategori: [],
+    },
   });
 
-  // Load kategori musik
+  const watchKategori = watch("kategori") || [];
+
+  // Load kategori musik and genres
   React.useEffect(() => {
     const loadKategori = async () => {
       const result = await getByJenis("musik");
@@ -47,26 +59,72 @@ const KaryaMusikForm: React.FC<KaryaMusikFormProps> = ({
         setKategoriOptions(result.data);
       }
     };
+    const loadGenres = async () => {
+      const result = await getGenres();
+      if (result.status === "berhasil" && result.data) {
+        setGenreOptions(result.data);
+      }
+    };
     if (isOpen) {
       loadKategori();
+      loadGenres();
     }
-  }, [isOpen, getByJenis]);
+  }, [isOpen, getByJenis, getGenres]);
 
-  // Reset form when editData changes
+  // Reset form when editData changes or modal opens/closes
   React.useEffect(() => {
-    if (editData) {
-      reset(editData);
-    } else {
-      reset({});
+    if (isOpen) {
+      if (editData) {
+        const kategoriFormatted = editData.kategori?.map((item: any) => ({
+          value: item.id,
+          label: item.nm_kategori,
+        })) || [];
+
+        reset({
+          ...editData,
+          kategori: kategoriFormatted as any,
+        });
+        setUploadedThumbnail(editData.thumbnail || "");
+      } else {
+        reset({
+          kategori: [],
+        });
+        setUploadedThumbnail("");
+      }
     }
-  }, [editData, reset]);
+  }, [editData, isOpen, reset]);
+
+  const handleThumbnailUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingThumbnail(true);
+    try {
+      const result = await uploadFile(file, "thumbnail");
+      if (result.status === "berhasil" && result.data) {
+        setUploadedThumbnail(result.data.path);
+        setValue("thumbnail", result.data.path);
+        toast.success("Thumbnail berhasil diupload");
+      } else {
+        toast.error("Gagal upload thumbnail");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Gagal upload thumbnail");
+    } finally {
+      setUploadingThumbnail(false);
+    }
+  };
+
 
   const onSubmit = async (data: any) => {
     setLoading(true);
     try {
       const formData = {
         ...data,
-        kategori_ids: data.kategori_ids?.map((item: any) => item.value) || [],
+        kategori_ids: data.kategori?.map((item: any) => item?.value || item) || [],
       };
 
       let result;
@@ -80,8 +138,9 @@ const KaryaMusikForm: React.FC<KaryaMusikFormProps> = ({
         toast.success(
           editData ? "Data berhasil diubah" : "Data berhasil ditambahkan"
         );
+        reset({ kategori: [] });
+        setUploadedThumbnail("");
         onClose();
-        reset();
       } else {
         toast.error(result.error?.message || "Terjadi kesalahan");
       }
@@ -97,6 +156,7 @@ const KaryaMusikForm: React.FC<KaryaMusikFormProps> = ({
     value: item.id,
     label: item.nm_kategori,
   }));
+
 
   return (
     <Modal
@@ -121,11 +181,27 @@ const KaryaMusikForm: React.FC<KaryaMusikFormProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Genre"
-            {...register("genre")}
-            error={errors.genre?.message}
-          />
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text font-medium">Genre</span>
+            </label>
+            <input
+              list="genre-options"
+              className="input input-bordered w-full"
+              placeholder="Pilih atau ketik genre..."
+              {...register("genre")}
+            />
+            <datalist id="genre-options">
+              {genreOptions.map((genre) => (
+                <option key={genre} value={genre} />
+              ))}
+            </datalist>
+            {errors.genre && (
+              <span className="text-error text-sm mt-1">
+                {errors.genre.message}
+              </span>
+            )}
+          </div>
 
           <Input
             label="Tanggal Rilis"
@@ -163,18 +239,48 @@ const KaryaMusikForm: React.FC<KaryaMusikFormProps> = ({
             helperText="SoundCloud, Spotify, dll"
           />
 
-          <Input
-            label="Thumbnail"
-            {...register("thumbnail")}
-            error={errors.thumbnail?.message}
-            helperText="URL gambar thumbnail"
-          />
+          {/* Thumbnail Upload */}
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text font-medium">Thumbnail</span>
+            </label>
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailUpload}
+                className="file-input file-input-bordered flex-1"
+                disabled={uploadingThumbnail}
+              />
+              {uploadingThumbnail && (
+                <span className="loading loading-spinner loading-sm"></span>
+              )}
+              <Image size={20} className="text-gray-400" />
+            </div>
+            {uploadedThumbnail && (
+              <div className="mt-2">
+                <span className="text-sm text-success">
+                  ✓ Thumbnail terupload: {uploadedThumbnail.split("/").pop()}
+                </span>
+              </div>
+            )}
+            <input
+              type="hidden"
+              {...register("thumbnail")}
+            />
+            {errors.thumbnail && (
+              <span className="text-error text-sm mt-1">
+                {errors.thumbnail.message}
+              </span>
+            )}
+          </div>
 
           <Select
             label="Kategori"
             options={kategoriSelectOptions}
             isMulti
-            {...register("kategori")}
+            value={watchKategori}
+            onChange={(event: any) => setValue("kategori", event.target.value)}
             placeholder="Pilih kategori..."
           />
         </div>

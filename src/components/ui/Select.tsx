@@ -58,9 +58,8 @@ export const Select = forwardRef<any, SelectProps>(
           {/* @ts-ignore */}
           <select
             ref={ref as React.Ref<HTMLSelectElement>}
-            className={`select select-bordered w-full ${
-              error ? "select-error" : ""
-            } ${className}`}
+            className={`select select-bordered w-full ${error ? "select-error" : ""
+              } ${className}`}
             onChange={onChange}
             onBlur={onBlur}
             value={value}
@@ -94,8 +93,8 @@ export const Select = forwardRef<any, SelectProps>(
         borderColor: error
           ? "#f87171"
           : state.isFocused
-          ? "#3b82f6"
-          : "#d1d5db",
+            ? "#3b82f6"
+            : "#d1d5db",
         "&:hover": {
           borderColor: error ? "#f87171" : "#3b82f6",
         },
@@ -106,20 +105,30 @@ export const Select = forwardRef<any, SelectProps>(
 
     // Convert value for react-select
     const reactSelectValue = value
-      ? options.find((option) => option.value === value)
-      : null;
+      ? Array.isArray(value)
+        ? value.length > 0
+          ? value.map((val: any) => {
+            // If val is already an object with value property, find matching option
+            const matchValue = typeof val === 'object' && val.value !== undefined ? val.value : val;
+            return options.find((option) => option.value === matchValue);
+          }).filter((item): item is SelectOption => item !== undefined)
+          : []
+        : options.find((option) => option.value === value) || null
+      : props.isMulti ? [] : null;
+
 
     // Handle react-select onChange
     const handleReactSelectChange = (
       newValue: SingleValue<SelectOption> | MultiValue<SelectOption>
     ) => {
       if (onChange) {
-        // Convert back to simple value for React Hook Form
+        // For multi-select, we need to pass the full objects, not just values
+        // For single-select, we pass just the value
         const selectedValue = Array.isArray(newValue)
-          ? newValue.map((item) => item?.value)
+          ? newValue // Keep full objects for multi-select
           : // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            newValue?.value || "";
+          // @ts-ignore
+          newValue?.value || "";
 
         // Create synthetic event for React Hook Form compatibility
         const syntheticEvent = {
