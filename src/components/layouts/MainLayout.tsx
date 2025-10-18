@@ -8,7 +8,6 @@ import useTheme from "@/stores/useTheme";
 import useAuth from "@/stores/useAuth";
 import Header from "./Header";
 import AdminSidebar from "./AdminSidebar";
-import UserNavbar from "./UserNavbar";
 import PublicNavbar from "./PublicNavbar";
 import BottomNavigation from "./BottomNavigation";
 
@@ -76,7 +75,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Header onMenuToggle={handleMenuToggle} showMenuButton={true} />
 
       {/* Navigation - tampilkan UserNavbar jika login, PublicNavbar jika belum login */}
-      {user ? <UserNavbar /> : <PublicNavbar />}
+      {<PublicNavbar />}
 
       {/* Main Content */}
       <main className="flex-1">{children}</main>

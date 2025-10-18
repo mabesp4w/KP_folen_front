@@ -4,7 +4,17 @@
 "use client";
 
 import React from "react";
-import { Home, Music, Calendar, Camera, X, User, LogOut, ChevronRight } from "lucide-react";
+import {
+  Home,
+  Music,
+  Calendar,
+  Camera,
+  X,
+  User,
+  LogOut,
+  ChevronRight,
+  User2,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import useAuth from "@/stores/useAuth";
@@ -43,6 +53,11 @@ const MobileUserMenu: React.FC<MobileUserMenuProps> = ({ isOpen, onClose }) => {
       icon: Camera,
       href: "/galeri",
       description: "Foto & video",
+    },
+    {
+      label: "Profil",
+      icon: User2,
+      href: "/profile",
     },
   ];
 
@@ -112,31 +127,42 @@ const MobileUserMenu: React.FC<MobileUserMenuProps> = ({ isOpen, onClose }) => {
                     onClick={onClose}
                     className={`
                       flex items-center gap-4 px-4 py-3 rounded-lg transition-all group
-                      ${isActive
-                        ? "bg-primary text-primary-content shadow-lg"
-                        : "hover:bg-base-200 active:bg-base-300"
+                      ${
+                        isActive
+                          ? "bg-primary text-primary-content shadow-lg"
+                          : "hover:bg-base-200 active:bg-base-300"
                       }
                     `}
                   >
-                    <div className={`
+                    <div
+                      className={`
                       p-2 rounded-lg transition-all
-                      ${isActive
-                        ? "bg-white/20"
-                        : "bg-primary/10 group-hover:bg-primary/20"
+                      ${
+                        isActive
+                          ? "bg-white/20"
+                          : "bg-primary/10 group-hover:bg-primary/20"
                       }
-                    `}>
+                    `}
+                    >
                       <IconComponent size={20} />
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold">{item.label}</p>
-                      <p className={`text-xs ${isActive ? "text-primary-content/80" : "text-base-content/60"}`}>
+                      <p
+                        className={`text-xs ${
+                          isActive
+                            ? "text-primary-content/80"
+                            : "text-base-content/60"
+                        }`}
+                      >
                         {item.description}
                       </p>
                     </div>
                     <ChevronRight
                       size={16}
-                      className={`transition-transform group-hover:translate-x-1 ${isActive ? "opacity-100" : "opacity-40"
-                        }`}
+                      className={`transition-transform group-hover:translate-x-1 ${
+                        isActive ? "opacity-100" : "opacity-40"
+                      }`}
                     />
                   </Link>
                 );
@@ -159,7 +185,10 @@ const MobileUserMenu: React.FC<MobileUserMenuProps> = ({ isOpen, onClose }) => {
                   <p className="font-semibold">Keluar</p>
                   <p className="text-xs text-error/80">Logout dari akun</p>
                 </div>
-                <ChevronRight size={16} className="opacity-40 transition-transform group-hover:translate-x-1" />
+                <ChevronRight
+                  size={16}
+                  className="opacity-40 transition-transform group-hover:translate-x-1"
+                />
               </button>
             )}
           </nav>
@@ -170,9 +199,7 @@ const MobileUserMenu: React.FC<MobileUserMenuProps> = ({ isOpen, onClose }) => {
               <p className="text-xs text-base-content/60">
                 © 2025 Rum Fararur Production
               </p>
-              <p className="text-xs text-base-content/40 mt-1">
-                v1.0.0
-              </p>
+              <p className="text-xs text-base-content/40 mt-1">v1.0.0</p>
             </div>
           </div>
         </div>
@@ -180,8 +207,12 @@ const MobileUserMenu: React.FC<MobileUserMenuProps> = ({ isOpen, onClose }) => {
 
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
         .animate-fadeIn {
           animation: fadeIn 0.2s ease-out;

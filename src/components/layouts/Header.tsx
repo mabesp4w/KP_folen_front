@@ -8,7 +8,6 @@ import { Menu, Sun, Moon, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import useTheme from "@/stores/useTheme";
 import useAuth from "@/stores/useAuth";
-import UserNavigation from "./UserNavigation";
 import { useRouter } from "next/navigation";
 
 interface HeaderProps {
@@ -41,7 +40,9 @@ const Header: React.FC<HeaderProps> = ({
         {showMenuButton && (
           <button
             onClick={onMenuToggle}
-            className={`btn btn-square btn-ghost text-white ${isAdmin ? '' : 'lg:hidden'}`}
+            className={`btn btn-square btn-ghost text-white ${
+              isAdmin ? "" : "lg:hidden"
+            }`}
           >
             <Menu size={20} />
           </button>
@@ -49,11 +50,6 @@ const Header: React.FC<HeaderProps> = ({
         <h1 className="text-xl font-bold text-white ml-2">
           Rum Fararur Production
         </h1>
-      </div>
-
-      <div className="navbar-center">
-        {/* User Navigation - tampil hanya untuk user biasa yang sudah login */}
-        {user?.role === "user" && <UserNavigation />}
       </div>
 
       <div className="navbar-end gap-2">
